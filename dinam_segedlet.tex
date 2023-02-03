@@ -1,0 +1,979 @@
+\documentclass[14p]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{yfonts}
+\usepackage{mathrsfs}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+
+\renewcommand{\contentsname}{Tartalom}
+
+\title{\Huge{Lineáris} differencia- és differenciálegyenletek, egyenletrenszerek és kapcsolatuk}
+\date{2023}
+\author{Bognár Miklós}
+
+\begin{document}
+
+\maketitle
+\pagestyle{fancy}
+\fancyhead[RO,LE]{}
+
+\overfullrule=0mm
+\tableofcontents
+\pagebreak
+
+\section{Előszó}
+A közgazdaságtanban sok modell alapja valamilyen állapotok közötti dinamika. Állapot alatt a minket érdeklő változók adott időbeli értékét értjük, dinamika alatt pedig azt a szabályt (egyenletet), ahogyan az állapot változik (fejlődik) időben. Az állapotokat \emph{állapotvektorral} fejezzük ki, a könyvben ezentúl ez diszkrét idő esetén $\pmb{x}_t$, folytonos idő esetén $\pmb{x}(t)$ jelölést fog kapni, ami a $t$-edik időbeli állapotvektort jelenti. Matematikailag az ilyen rendszereket \emph{differenciálegyenlet-rendszereknek}, avagy \emph{differenciaegyenlet-rendszereknek} nevezzük, attól függően, hogy folytonosnak avagy diszkrétnek tekintjük az időt.
+\\
+\\
+Az első néhány fejezetben a diszkrét idejű rendszerek, illetve az előadásokon tudomásom szerint egyáltalán nem tárgyalt véges-differencia kalkulus (umbral calculus) és különböző operátorok bevezetése lesz fókuszban, majd az ezutáni fejezetek a folytonos idejű rendszereket és a diszkrét rendszerekkel való kapcsolatukat tárgyalja. Ugyan a könyvben csak a lineáris rendszerekről lesz szó, a nemlineáris egyenleteket a nullállapot körüli \emph{linearizációval} lineáris rendszerekké alakíthatjuk, így ezek tanulmányozásába nem fogunk belemenni. A fontos gondolatokat, ötleteket a könyv a diszkrét rendszereken keresztül vezeti be, így elsősorban ezen rendszerek tanulmányozása lesz a fő cél. 
+\\
+\\
+A könyv \emph{nem} tankönyv jelleggel jött létre, célja elsősorban az, hogy az olvasó intuitíven átlássa a kapcsolatot a diszkrét és folytonos egyenletek között, és számára talán új szemszögből lássa az egyetemen tanultakat. Az anyag kiegészítő jellegű, nem szerepel benne az előadásokon és gyakorlatokon tanult anyag egésze (a kvalitatív elemzés, stabilitásvizsgálat témakörök nincsenek tárgyalva). Az olvasótól elvárható, hogy tisztában legyen a lineáris algebra fogalmaival.  
+
+\pagebreak
+
+\section{Lineáris elsőrendű differenciaegyenlet-rendszerek}
+Egy lineáris elsőrendű differenciaegyenlet-rendszer általános alakja
+\[
+	\pmb{x}_{t} = \mathcal{A}\pmb{x}_{t-1} + \mathcal{\omega}_{t}
+\]
+ahol $\pmb{x}$ a rendszerben szereplő változókból álló $n \times 1$ -es oszlopvektor, $\mathcal{A}$ egy $n \times n$ -es mátrix, és $\pmb{x}_{t}$ a változók $t$ idejű állapota. Általában $t = 0, 1, ...$. $\omega$ -t a rendszer \emph{inhomogén} tagjának hívjuk ($\omega$ elemei időtől függőek is lehetnek). Teljes formájában kiírva:
+\[
+		\begin{bmatrix}
+		x_{1,t} \\
+		x_{2,t} \\
+		\vdots \\
+		x_{n,t}
+		\end{bmatrix}
+		=
+		\begin{bmatrix}
+		a_{11} & a_{12} & \cdots a_{1n} \\
+		a_{21} & a_{22} & \cdots a_{2n} \\
+		\vdots & \ddots & \vdots \\
+		a_{n1} & a_{n2} & \cdots a_{nn}
+		\end{bmatrix}
+		\begin{bmatrix}
+		x_{1,t-1} \\
+		x_{2,t-1} \\
+		\vdots \\
+		x_{n,t-1}
+		\end{bmatrix}
+		+
+		\begin{bmatrix}
+		\omega_{1,t} \\
+		\omega_{2,t} \\
+		\vdots \\
+		\omega_{n, t}
+		\end{bmatrix}
+\]
+Ha az állapotvektor egyelemű, az állapotáttérés-mátrix $(1 \times 1)$-es, tehát skalár.
+Az ilyen rendszerek általános megoldásához a \emph{lineáris szuperpozíció} elvét használjuk, miszerint ha találunk a homogén rendszerre ($\omega$ nélküli rendszer) egy $\pmb{x}^{h}_{t}$ ú.n. \emph{homogén} megoldást, és mellé $\omega$ alakjának segítségével egy $\pmb{x}^{p}_{t}$ \emph{partikuláris} megoldást, akkor az általános megoldásunk $\pmb{x}_{t} = \pmb{x}^{h}_{t} + \pmb{x}^{p}_{t}$ lesz.
+\\
+\subsection{A szuperpozíció elve}
+A jelölések egyszerűsítése végett (és mert megértésük nagyon hasznos nem csak itt, de a matematika más ágazataiban is) bevezetjünk néhány, a dinamikai rendszerek vizsgálatánál gyakran használt \emph{operátort}\footnotemark{}\footnotetext{A későbbiekben több operatárt is tanulmányozunk, és látni fogjuk, hogy a differencia- és differenciálegyenletek között sokkal több a hasonlóság, mint amit elsőnek feltételeznénk.}. Legyen
+\[
+	\mathcal{T} \in \mathscr{L}(\textswab{X},\textswab{X}) 
+\] 
+az \emph{egységnyi eltolás} (lineáris) operátora, amely egy $x \mapsto f(x)$ függvényt $x \mapsto f(x+1)$ -be visz. Példa:  $\mathcal{T}(x^3) = (x+1)^3 = x^3 + 3x^2 + 3x + 1$. Az eltolás operátor hatványai: $\forall n \in \mathbb{Z} \quad \colon \mathcal{T}^{n} = \mathcal{T}\mathcal{T}^{n-1} = \dots = \mathcal{T}\mathcal{T} \dots \mathcal{T}$, \quad $\mathcal{T}^{n} f(x) = f(x+n)$. 
+Érdemes megjegyezni, hogy polinomok esetén a $\mathcal{T}$ operátor a binomiális koefficienseket adja vissza.
+Könnyen belátható, hogy ez az operátor lineáris, és ha a homogén és inhomogén differenciaegyenlet-rendszereinket rendre ennek segítségével írjuk föl:
+\[
+	\mathcal{T}\pmb{x}^{h}_{t} = \mathcal{A}\pmb{x}^{h}_{t}
+\]
+\[
+	\mathcal{T}\pmb{x}^{p}_{t} = \mathcal{A}\pmb{x}^{p}_{t} + \omega_{t}
+\]
+$\mathcal{T}$ linearitását kihasználva az egyenleteket összeadva az
+\[
+	\mathcal{T}(\pmb{x}^{p}_{t}+  \pmb{x}^{h}_{t}) = \mathcal{A}(\pmb{x}^{p}_{t}+  \pmb{x}^{h}_{t}) + \omega_{t}
+\]
+egyenletet kapjuk, ahonnan azonnal látszik, hogy a homogén és inhomogén rendszer egy partikuláris megoldásának összege megoldása lesz az eredeti feladatnak.
+\subsection{A homogén rendszer megoldása}
+A differenciaegyenlet-rendszerünk homogén része az 
+\[
+	\pmb{x}_{t} = \mathcal{A}\pmb{x}_{t-1}
+\]
+egyenlet. Kisebb gondolkodás után könnyen látszik, hogy minden t "időlépéssel" az $\pmb{x}$ állapotvektorunk $\mathcal{A}$-szorosára változik, így ha adott egy $\pmb{x}_{0}$ kezdeti állapot, a t-edik időpontban $\pmb{x}_{t} = \mathcal{A}^{t}\pmb{x}_{0}$. Lineáris algebrából jól ismert, hogy minden $n \times n$ négyzetes mátrix felbontható az úgynevezett \emph{spektrális felbontás} segítségével, ami értelmében
+\[
+	\mathcal{A} = \mathcal{S}\Lambda\mathcal{S}^{-1} ,
+\]
+ahol $\mathcal{S}$ az $\mathcal{A}$ mátrix sajátvektorait (és adott esetben általánosított sajátvektorait) tartalmazó $n \times n$ -es invertálható mátrix (gondoljunk itt a sajátvektorok lineáris függetlenségére), $\Lambda$ pedig egy felső-háromszög alakú mátrix, melynek főátlójában $\mathcal{A}$ sahátértékei vannak, és nem nulla elemei kizárólag a fóátló fölötti mellékátlóban fordulhatnak elő.
+\\
+Írjuk föl $\mathcal{A}^{t}$-t a spektrális felbontás segítségével és használjuk ki a lineáris operátorok asszociativátását:
+\[
+	\mathcal{A}^t = (\mathcal{S}\Lambda\mathcal{S}^{-1})^t = (\mathcal{S}\Lambda\mathcal{S}^{-1})(\mathcal{S}\Lambda\mathcal{S}^{-1}) \dots (\mathcal{S}\Lambda\mathcal{S}^{-1}) = \mathcal{S}\Lambda\mathcal{S}^{-1}\mathcal{S}\Lambda\mathcal{S}^{-1} \dots \mathcal{S}\Lambda\mathcal{S}^{-1}
+\]
+\[
+	\mathcal{A}^t = \mathcal{S}\Lambda^t\mathcal{S}^{-1}
+\]
+Amint láthatjuk, a sajátvektorok mátrixa változatlan marad, a sajátértékek mátrixa pedig hatványozódik. Sok esetben $\mathcal{A}$ \emph{diagonalizálható}, ami annyit jelent, hogy $\Lambda$ diagonális, n darab sajátértéke van (persze nem feltétlenül kell különbözniük) és így hatványai nagyon könnyen számolhatóak:
+\[
+	\Lambda^t = 
+		\begin{bmatrix}
+		\lambda_1 & 0 & \dots & 0 \\
+		0 & \lambda_2 & \dots & 0 \\
+		\vdots & &\ddots & \vdots \\
+		0 & 0 & \dots & \lambda_n
+		\end{bmatrix}
+		^{t}
+		=
+		\begin{bmatrix}
+		\lambda^{t}_1 & 0 & \dots & 0 \\
+		0 & \lambda^{t}_2 & \dots & 0 \\
+		\vdots & & \ddots & \vdots \\
+		0 & 0 & \dots & \lambda^{t}_n
+		\end{bmatrix}
+\]
+\[
+	\mathcal{A}^t =
+	\begin{bmatrix}
+		\mid & \mid \\
+		\pmb{s}_1 & \pmb{s}_2 & \dots \\
+		\mid & \mid
+	\end{bmatrix}
+	\begin{bmatrix}
+		\lambda^{t}_1 & 0 & \dots & 0 \\
+		0 & \lambda^{t}_2 & \dots & 0 \\
+		\vdots & & \ddots & \vdots \\
+		0 & 0 & \dots & \lambda^{t}_n
+	\end{bmatrix}
+	\begin{bmatrix}
+		\mid & \mid \\
+		\pmb{s}_1 & \pmb{s}_2 & \dots \\
+		\mid & \mid
+	\end{bmatrix}
+	^{-1},
+\]
+ahol $\pmb{s}_k$ a k-adik sajátvektor.
+Szokásos a \emph{decentralizáltság} fogalmat bevezetni, ami a diagonalizálható $\mathcal{A}$ esetében azt jelenti, hogy $\pmb{x}_t$ elemei csak saját kezdetiértéküktől és t-től függnek, egymástól függetlenek.
+Egy fokkal kellemetlenebb a helyzet, ha $\mathcal{A}$ nem diagonalizálható, ilyenkor $\Lambda$ blokk-mátrix jelöléssel
+\[
+		\Lambda = 
+			\begin{bmatrix}
+			\textswab{J}(\lambda_1) & \textswab{0} & \dots & \textswab{0} \\
+			\textswab{0} & \textswab{J}(\lambda_2) & \dots & \textswab{0} \\
+			\vdots & \vdots & \ddots & \vdots \\
+			\textswab{0} & \textswab{0} & \dots & \textswab{J}(\lambda_n)
+			\end{bmatrix}
+\]
+alakú
+\footnotemark{}\footnotetext{$\Lambda$-t blokk-diagonálisnak nevezzük}
+, ahol $\textswab{J}(\lambda_k)$ a k-adik sajátértékhez tartozó \emph{Jordan-blokk}\footnotemark{}\footnotetext{Lineáris algebrából ismerős lehet, hogy ezen Jordan-blokkok maguk is négyzetes mátrixok, a $\lambda_k$-hoz tartozó blokk főátlójában $\lambda_k$-k vannak, felettük pedig 1-esek vagy 0-sok. Ha minden Jordan-blokk mérete 1 (azaz nincsenek felettük 1-esek), akkor $\mathcal{A}$ diagonalizálható}.
+
+\[
+		\Lambda^t = 
+		\begin{bmatrix}
+		\textswab{J}^t(\lambda_1) & \textswab{0} & \dots & \textswab{0} \\
+		\textswab{0} & \textswab{J}^t(\lambda_2) & \dots & \textswab{0} \\
+		\vdots & \vdots & \ddots & \vdots \\
+		\textswab{0} & \textswab{0} & \dots & \textswab{J}^t(\lambda_n)
+		\end{bmatrix}		
+\]
+	
+A $2 \times 2$-es esetet speciálisan is érdemes megnézni, hiszen az ott levont tanulságokat alkalmazhatjuk magasabb dimenziókra is.
+Legyen $\mathcal{A} \in \mathbb{F}^{2 \times 2}$, a 2-változós elsőrendű homogén lineáris differenciaegyenlet \emph{nem-diagonalizálható} mátrixa. A spektrális felbontást követően $\Lambda$ a 
+\[
+		\Lambda =
+		\begin{bmatrix}
+		\lambda & 1 \\
+		0 & \lambda
+		\end{bmatrix}
+\]
+formában fog előállni\footnotemark{}\footnotetext{Szintén lineáris algebra: a $2 \times 2$-es esetben ha $\Lambda$ nem diagonális, biztosan 1 darab sajátérték lesz, 2-szeres algebrai multiplicitással.}. Figyeljük meg, hogy
+\[
+	\Lambda = \lambda\mathcal{I} + \mathcal{N} 
+\]
+ahol
+\[
+	\mathcal{N} =
+		\begin{bmatrix}
+		0 & 1 \\
+		0 & 0
+		\end{bmatrix}
+\]
+és $\mathcal{N}$ \emph{másodrendben nilpotens}, tehát $\mathcal{N}^2 = \mathbb{O}_{2 \times 2}$.
+\[
+	\Lambda^t = (\lambda\mathcal{I} + \mathcal{N})^t = \sum_{k=0}^{t}{t \choose k}\lambda^k\mathcal{I}^k\mathcal{N}^{t-k} = {t \choose t-1} \lambda^{t-1}\mathcal{I}^{t-1}\mathcal{N} + {t \choose t}\lambda^t\mathcal{I}^{t} 
+\]
+\[
+	\Lambda^t = 
+		\begin{bmatrix}
+		\lambda^t & t\lambda^{t-1} \\
+		0 & \lambda^t
+		\end{bmatrix}
+\]
+Általánosságban elmondható, hogy $\Lambda$ hatványainak kiszámításához szükségünk van a Jordan-blokkok hatványaihoz, amiket aztán az átlóba rakva megkapjuk $\Lambda^t$-t. Sokszor elegendő $2 \times 2$ -es Jordan blokkokat hatványozgatni, de van, amikor ennél nagyobb blokkjaink vannak. 
+
+\hrulefill
+
+Legyen $\mathfrak{f} : \mathbb{R}^{n \times n} \rightarrow \mathbb{R}^{n \times n}$ egy mátrixfüggvény. Legyen $\textswab{J} \in \mathbb{R}^{k \times k}$ a $\lambda$ sajátértékhez tartozó $k \times k$ -es Jordan blokk. Ekkor
+\[
+		\mathfrak{f}(\textswab{J}) =
+		\begin{bmatrix}
+		\mathfrak{f}(\lambda) & \mathfrak{f}'(\lambda) & \dots & \frac{\mathfrak{f}^{(k-1)}(\lambda)}{(k-1)!} \\
+		0 & \mathfrak{f}(\lambda) & \dots & \frac{\mathfrak{f}^{k-2}(\lambda)}{(k-2)!} \\
+		\vdots & \vdots & \ddots & \vdots \\
+		0 & 0 & \dots &  \mathfrak{f}(\lambda)
+		\end{bmatrix}
+\]
+Ha speciálisan az $\mathfrak{f}(x) = x^t$ függvényt vesszük:
+\[
+		\begin{bmatrix}
+		\lambda & 1 & 0 & \dots & 0 \\
+		0 & \lambda & 1 & \dots & 0 \\
+		\vdots & \vdots & \vdots & \ddots & 1\\ 
+		0 & 0 & 0 & \dots & \lambda
+		\end{bmatrix}^t_{k \times k}
+		=
+		\begin{bmatrix}
+		\lambda^t & {t \choose 1} \lambda^{t-1} & \dots & {t \choose k-1} \lambda^{t-k+1} \\
+		0 & \lambda^t & \dots & {t \choose k-2} \lambda^{t-k+2} \\
+		\vdots & \vdots & \ddots & \vdots  \\
+		0 & \dots & \lambda^t & {t \choose 1} \lambda^{t-1} \\
+		0 & 0 & \dots & \lambda^t
+		\end{bmatrix}_{k \times k}
+\]
+A bizonyítást nem vezetjük le, de érdemes észben tartani, hogy megint nilpontens mátrixokat használunk, rendre $ j \leq k \colon \mathcal{N}^j = \mathbb{O}_{k \times k}$. Az alapvető ötlet ugyanaz, mint a $2 \times 2$ -es esetnél.
+
+\hrulefill
+
+Láttuk tehát, hogy a mátrixhatványozásnál segítségünkre van a spektrális dekompozíció, és láttuk, hogy ha a rendszermátrixunk diagonalizálható, akkor a rendszer "szétesik" úgynevezett alrendszerekre, amik egymástól függetlenül fejlődnek idővel.
+
+\subsection{Példa}
+\[
+	\pmb{x_t} = 
+	\begin{bmatrix}
+	3 & 1 \\
+	-1 & 1
+	\end{bmatrix} \pmb{x}_{t-1}
+\]
+Jelölje $A$ az állapotáttérés-mátrixot, $A$ karakterisztikája
+\[
+	\chi_A(\lambda) = |A - \lambda I| = (\lambda - 2)^2
+\]
+a $2$ sajátérték algebrai multiplicitása $2$, így a mátrix Jordan-alakja
+\[
+	D = 
+	\begin{bmatrix}
+	2 & 1 \\
+	0 & 2
+	\end{bmatrix}
+\]
+A sajátvektor
+\[
+	(A - 2I)\pmb{s}_1 = \mathbf{0}
+\]
+\[
+	\pmb{s}_1 = [1, -1]^T
+\]
+és a hozzá tartozó másodrendű általánosított sajátvektor
+\[
+	(A - 2I)\pmb{s}_2 = \pmb{s}_1
+\]
+\[
+	\pmb{s}_2 = [1, 0]^T
+\]
+Tehát a sajátvektor-mátrixunk és inverze az alábbi formát ölti:
+\[
+	\mathcal{S} = 
+	\begin{bmatrix}
+	1 & 1 \\
+	-1 & 0
+	\end{bmatrix} \Longrightarrow
+	\mathcal{S}^{-1} = 
+	\begin{bmatrix}
+	0 & -1 \\
+	1 & 1
+	\end{bmatrix}
+\]
+Legyen $\pmb{y}_t := \mathcal{S}^{-1}\pmb{x}_t$, így
+\[
+	\pmb{y}_t = \mathcal{S}^{-1}\mathcal{S}D\mathcal{S}^{-1}\pmb{x}_{t-1} = D\pmb{y}_{t-1}
+\]
+\[
+	D^t = 
+	\begin{bmatrix}
+	2^t & t2^{t-1} \\
+	0 & 2^t
+	\end{bmatrix}
+\]
+Legyen a kezdeti állapotunk $\pmb{x}_0 = [5, 2]^T$.
+\[
+	\pmb{y}_0 = \mathcal{S}^{-1}\pmb{x}_0 = 
+	\begin{bmatrix}
+	-2 \\
+	7
+	\end{bmatrix}
+\]
+\[
+	\pmb{y}_t = D^t\pmb{y}_0 = 
+	\begin{bmatrix}
+	7t2^{t-1} - 2^{t+1} \\
+	72^t
+	\end{bmatrix}
+\]
+Visszaszorozva jobbról $\mathcal{S}$-el:
+\[
+	\pmb{x}_t = 
+	\begin{bmatrix}
+	5 \times 2^t + 7t2^{t-1} \\
+	2 \times 2^t - 7t2^{t-1}
+	\end{bmatrix}
+\]
+
+\subsection{Az inhomogén rendszer partikuláris megoldása}
+Emlékezzünk vissza, hogy a rendszerünkben $\omega_t$ jelentette az inhomogén tagot, sőt, a partikuláris megoldásunk lehetséges alakja is pusztán $\omega_t$-tól függ.
+Vegyük példának okáért az alábbi inhomogén rendszert:
+\begin{align*}
+	\pmb{x}_{t+1} =
+	\begin{bmatrix}
+	1 & -2 \\
+	-1 & 3
+	\end{bmatrix} \pmb{x}_t +
+	\begin{bmatrix}
+	1 + t \\
+	t
+	\end{bmatrix}, \quad
+	\pmb{x}_0 =
+	\begin{bmatrix}
+	1 \\
+	0
+	\end{bmatrix}
+\end{align*}
+
+$\omega_t$ alakja t-ben elsőfokú polinom, így a lehetséges partikuláris $\pmb{x}^{p}$ megoldás alakja
+\[
+	\pmb{x}_{t}^{p} = 
+	\begin{bmatrix}
+	A + Bt \\
+	C + Dt
+	\end{bmatrix}
+\]
+ahol $A, B, C, D \in \mathbb{R}$ valós koefficiensek. A két állapotegyenleteket felírva,
+\[
+	A + Bt + B = A + Bt - 2C -2Dt + 1 + t
+\]
+\[
+	C + Dt + D = -A - Bt + 3C + 3Dt + t
+\]
+és $t$-k együtthatóit a két oldalon egyenlővé téve adódik az $A = -3/2$, $B = 2$, $C = -1/2$ és $D = 1/2$ megoldás, amivel
+\[
+	\pmb{x}_{t}^{p} = 
+	\begin{bmatrix}
+	-3/2 + 2t \\
+	-1/2 + 1/2t
+	\end{bmatrix}
+\]
+partikuláris megoldás. Általánosságban elmondható, hogy ha polinomiális alakú inhomogén tagunk van, akkor a partikuláris megoldásnak is t-ben annyiadik fokú polinomnak kell lennie. A partikuláris megoldás alakjáról a folytonos idejű rendszerek fejezetben bővebben szó lesz, most érjük be annyival, hogy nem mindig ilyen könnyű "megtippelni" a megfelelő alakot. A fenti rendszer teljes megoldása $\pmb{x}_t = \pmb{x}_{t}^{p} + \pmb{x}_{t}^{h}$ lesz, a homogén megoldás gyakorlás gyanánt az olvasóra van bízva.
+
+
+\section{Operátorok és véges-differencia kalkulus}
+A szuperpozíciókról szóló részben már szó volt a $\mathcal{T} \in \mathscr{L}(\textswab{X}, \textswab{X})$ lineáris \emph{egység-eltolás} operátorról. A következőkben bevezetünk néhány új lineáris operátort, melyek ismerete nagyban segítheti en-bloc a dinamikai rendszerek megértését, nem csak a diszkrét elsőrendű esetben. Itt jegyezném meg, hogy ugyan az operátorok tanulmányozása technikailag a \emph{funckcionálanalízis} témakörébe tartozik, úgy vélem, hogy minél előbb találkozunk velük tanulmányaink során, annál jobb. Nem utolsó sorban pedig látni fogjuk, hogy a diszkrét és folytonos időben definiált rendszerek között nagyon mély kapcsolat húzódik. Az elkövetkező alfejezetekben $f$ függvényekre polinomokként kell gondolni (ez nem egy elrugaszkodott egyszerűsítés, hiszen analízisből tudjuk, hogy minden tetszőlegesen sokszor deriválható függvény felírható egy $a \in \mathscr{D}_f$ pont körül polinomként). Az \emph{identitás operátorra} $1$-ként hivatkozunk, és hasonlóan, a függvény $a$ skalárral való szorzására pedig $a$-ként (ez persze "hagyományos jelöléssel" az $aI$ operátort jelenti). A vizsgált polinomok \emph{lehetnek} véges és végtelenek is, nekünk ez most nem annyira életbevágó, azonban meg kell jegyezni, hogy van különbség véges és végtelen dimenziós operátorok között. 
+
+\subsection{Az első-különbség operátor}
+Legyen $\Delta \in \mathscr{L}(\textswab{X}, \textswab{X})$ lineáris operátor, $\Delta {f}(x) = {f}(x+1) - {f}(x)$ -ként definiálva. \\
+Azonnal látható, hogy 
+\[
+	(\Delta \circ \Delta)f = \Delta^2 f = \Delta(\Delta f) 
+\]
+és 
+\[
+	\Delta^2 f(x) = (f(x+2) - f(x+1))-(f(x+1) - f(x)) = f(x+2) - 2f(x+1) + f(x) = 
+\] 
+\[
+	(\mathcal{T}^2 f - 2\mathcal{T} f + f)(x)
+\]
+$\Delta$ linearitásának belátása nagyon könnyű, nem is húzzuk vele feleslegesen az olvasó idejét. Ezen a ponton egy hasznos összefüggésre hívnám föl az olvasó figyelmét, miszerint
+\[
+	\Delta = \mathcal{T} - 1
+\]
+Ebből azonnnal következik az előbbi $\Delta^2 = (\mathcal{T}-1)^2 = \mathcal{T}^2 - 2\mathcal{T} + 1$ összefüggés is.
+\\
+\\
+Általánosabban is megfogalmazhatjuk $\Delta$ viselkedését, legyen most $a(n) = a_n, n \in \mathbb{N}$ diszkrét idejű sorozat. Persze $(\Delta a)(n) = a(n+1) - a(n)$.
+\[
+	\Delta^k a_n = \sum_{t=0}^{k}{(-1)^t {k \choose t} a_{n+k-t}}
+\]    
+
+\subsection{Összegoperátor (Szummaoperátor)}
+Legyen $\Sigma \in \mathscr{L}(\textswab{X}, \textswab{X})$ lineáris operátor az összegoperátor, hogy $\Delta\Sigma f = f$. $\Sigma$-ra úgy is tekinthetünk, mint az első-különbség \emph{inverzére}. Az integrálással teljesen analóg módon beszélhetünk \emph{határozatlan} és \emph{határozott} összegzésről. Az előbb definiált $\Sigma$ a határozatlan szummázás. Nézzük meg az alábbi esetet most \emph{határozott} szummázással:
+\[
+	\sum_{k=a}^{x-1}\Delta f(k) = \Delta f(a) + \Delta f(a+1) + \dots + \Delta f(x-2) + \Delta f(x-1)
+\]
+A $\Delta$ operátor definícióját felhasználva és a köztes tagok teleszkopikus kiejtése után:
+\[
+	\sum_{k=a}^{x-1}\Delta f(k) = f(x) - f(a)
+\]
+A fenti egyenlőség kísértetiesen hasonlít az \emph{analízis alaptételére}, csak az integrálás helyett szumma, a differenciálás helyett pedig első-különbség operátor van. Ezt az összefüggést felhasználva megkaphatjuk a híres \emph{első n négyzetszám összege} probléma megoldását is, ha észrevesszük, hogy:
+\[
+	\sum_{n=0}^{x-1} n^2 = f(x) \Longleftrightarrow \Delta f(x) = x^2,
+\]
+azonban ennek megoldása gyakorlás gyanánt az olvasóra lesz bízva.
+\subsection{Eső-hatványok}
+Legyen $x \in \mathbb{R}, \forall n \in \mathbb{N}$ esetén $x_n = x(x-1)(x-2)\dots (x-n+2)(x-n+1)$ x \emph{n-edik eső-hatványa}. A következőkben belátjuk, hogy az eső-hatvány a hagyományos hatvány \emph{diszkrét} analógiája bizonyos értelemben.
+Vegyük észre, hogy
+\[
+	x_n = x_{n-1}(x-n+1)
+\]
+\[
+	x_{n-1} = x(x-1)(x-2)\dots (x-n+2)
+\]
+\[
+	(x+1)_n = (x+1)x_{n-1}
+	\Downarrow
+\]
+\[
+	\Delta x_n = (x+1)_n - x_n = (x+1)x_{n-1} - x_{n-1}(x-n+1) = nx_{n-1}
+\]
+Tehát az eső-hatványaink az első-differencia operátorral véve úgy viselkednek, mint a hagyományos hatványok a differenciál-operátorral. Érdemes megjegyezni, hogy ezt a hatványkoncepciót kiterjeszthetjük az egész számokra is,
+\[
+	x_{-n} = \frac{1}{x(x+1)\dots (x+n)}
+\]
+módon. Az eddigi operátorainkra együttesen az egyértelműség kedvéért \emph{diszkrét operátorok} néven fogunk utalni a továbbiakban.
+\subsection{A diszkrét és folytonos operátorok kapcsolata}
+Tekintsük az $\mathbf{F}[\mathbb{X}]$ polinomgyűrű elemeit, és vizsgáljuk meg rajtuk keresztül a folytonos és diszkrét operátorokat.
+\[
+	x^n \xrightarrow{\mathcal{D}} nx^{n-1}
+\]
+\[
+	x_n \xrightarrow{\Delta} nx_{n-1}
+\]
+ahol $\mathcal{D}$ a folytonos \emph{deriválás-operátor}, ami egy speciális (1 dimenziós) esete a \emph{differenciál-operátoroknak}. Tegyük fel, hogy létezik egy $\phi \in \mathscr{L}(\mathbf{F}[\mathbb{X}],\mathbf{F}[\mathbb{X}])$ lineáris operátor, amivel hagyományos hatványokat eső-hatványokká "alakítunk". $\phi$ egyfajta "polinomtranszformáció", és
+ mivel függvényeinket polinomokként értelmezzük, ezért $\phi$ egyben \emph{függvénytranszformáció} is ilyen értelemben. Egy tetszőleges $x^n$-ből indulva
+\[
+	x^n \xrightarrow{\phi} x_n \xrightarrow{\Delta} nx_{n-1}
+\]
+és
+\[
+	x^n \xrightarrow{\mathcal{D}} nx^{n-1} \xrightarrow{\phi} nx_{n-1}
+\]
+Mivel a polinomok ilyen $x^n, n \in \mathbb{N}$ egytagú polinomok lineáris kombinációi, és mivel $\phi$ lineáris\footnotemark\footnotetext{$\phi$ linearitásához elég annyit belátni, hogy $\phi(x^n+y^n) = x_n + y_n = \phi x^n + \phi y^n$, illetve $ \phi (ax^n) = ax_n = a\phi x^n$} Azt kaptuk tehát, hogy
+\[
+	\Delta \phi = \phi \mathcal{D}
+\]
+Átrendezve, és figyelve arra, hogy $\phi$-nek, $\mathcal{D}$-nek és $\Delta$-nak operátorok lévén meg kell különböztetni \emph{jobb} és \emph{bal inverzüket}:
+\[
+	\Delta = \phi \mathcal{D} \phi^{-1}
+\]
+Ha most "visszafele" megyünk végig ugyanezen a folyamaton, és felhasználjuk, hogy $\Delta^{-1} = \Sigma$ és $\mathcal{D}^{-1} = \mathcal{I}$, ahol $\mathcal{I}$ a folytonos \emph{integráloperátor}:
+\[
+	\Sigma = \phi\mathcal{I}\phi^{-1}
+\]
+Lineáris algebrábai ismereteinkre támaszkodva tehát kijelenthetjük, hogy a diszkrét és folytonos operátorok \emph{hasonlóak} egy bizonyos $\phi$ lineáris transzformáció alatt.
+Érdekességnek meg lehet említeni, hogy a korábban hivatkozott \emph{első n négyzetszám összege} problémát tehát az alábbi módon is megoldhatjuk:
+\[
+	f(x) = \sum_{n=0}^{x-1}n^2 = \phi \int_0^x\phi^{-1}n^2 dn
+\]
+ahol $f(x)$ az első x négyzetszám összege függvénye lesz és $\phi^{-1}$ a $\phi$ transzformáció inverze (bár erről ezen a ponton még nem sokat tudunk a lehetséges létezésén kívül).
+\subsection{Operátorok exponenciális kapcsolata és $\phi$}
+Láttuk, hogy polinomoknál $\phi$ egyszerűen annyit jelent, hogy a hatványokat eső-hatványokra cseréljük. Nézzük egy egzotikusabb függvény $\phi$-transzformációját $a$ skalár esetén:
+\[
+	\phi e^{ax} = \phi(\sum_{k=0}^{\infty} \frac{a^k x^k}{k!}) = \sum_{k=0}^{\infty} \frac{ a^k x_k}{k!} = \sum_{k=0}^{\infty} {x \choose k} a^k = (a+1)^x
+\]
+Ez az azonosság a későbbiekben kulcsfontosságú lesz, tehát ha valamit is, ezt mindenképp érdemes észben tartani.
+Az exponenciális függvénynél maradva:
+\[
+	\mathcal{T}^x f(a) = f(a+x) = \sum_{k=0}^{\infty} \frac{x^k\mathcal{D}^k f(a)}{k!} = e^{x\mathcal{D}} f(a)
+\]
+\[
+	\mathcal{T} = e^{\mathcal{D}} = \Delta + 1
+\]
+\[
+	\Delta = e^{\mathcal{D}} - 1
+\]
+Azt kaptuk tehát, hogy a folytonos és diszkrét "differenciálás" operátorok között egyfajta 
+\emph{exponenciális} kapcsolat van. Az előző alfejezetben bevezetett  $\phi$-
+hasonlóságukat az operátoroknak kihasználva felírhatjuk az alábbi,
+ igencsak érdekes összefüggéseket, amiken érdemes lehet elgondolkozni:
+\[
+	\Delta = \phi \mathcal{D} \phi^{-1} = e^{\mathcal{D}} - 1 
+\]
+\[
+	e^{\Delta} = \phi e^{\mathcal{D}}\phi^{-1} = \phi \mathcal{T} \phi^{-1} \xrightarrow{ln} \Delta = ln(\phi\mathcal{T}\phi^{-1})
+\]
+\[
+	\mathcal{T} - 1 = ln(\phi\mathcal{T}\phi^{-1})
+\]
+\[
+	e^{\mathcal{T} - 1} = \phi \mathcal{T} \phi^{-1}
+\]
+\section{Lineáris magasabb rendű differenciaegyenletek}
+Az első fejezetben látott elsőrendű rendszerekhez képest a magasabb rendű rendszerekben az állapotvektort többszörös időindex-eltolás kíséri. Egy $n$-edrendű rendszer általános alakja:
+\[
+	\pmb{x}_t = \sum_{k=1}^{n}{\mathcal{A}_{k}\pmb{x}_{t-k}} + \omega_{t}
+\]
+A fejezet elkövetkező részében a megértést elősegítvén az állapotvektorunk egyelemű lesz, így minden $\mathcal{A}_k$ egyszerű skalárrá redukálódik. A szuperpozíció elvéből adódóan itt is igaz lesz, hogy a teljes megoldásunk a homogén megoldás és egy partikuláris megoldás összegeként fog adódni, így a kompaktság kedvéért csak a homogén esettel fogunk foglalkozni. Fontos megjegyzés, hogy egy $p$-rendű egyenlet visszavezethető elsőrendű egyenletrendszerré, ahol az állapotvektorunk elemei rendre $\pmb{x}_t, \pmb{x}_{t-1} \dots \pmb{x}_{t-p+1}$ lesznek.
+\\
+\\
+Az első fejezetben láttuk, hogy az elsőrendű homogén rendszer megoldása $\pmb{x}_0$ kezdeti értékkel
+\[
+	\pmb{x}_t = \mathcal{A}^t\pmb{x}_0,
+\]
+ennek analógiájára szeretnénk találni egy zárt formulát az n-edrendű rendszer megoldására is.
+\subsection{A karakterisztikus egyenlet}
+Vegyünk példának okáért egy másodrendű lineáris differenciaegyenletet:
+\[
+	\pmb{x}_t = \pmb{x}_{t-1} + \pmb{x}_{t-2}
+\]
+ez a jól ismert \emph{Fibonacci-számsor} dinamikája $x_0 = 0$, $x_1 = 1$ kezdeti értékekkel.
+Ezen rendszer \emph{karakterisztikus egyenlete} az
+\[
+	r^2 = r + 1
+\]
+másodfokú egyenlet, ahol $r$ a \emph{karakterisztikus gyök}. A karakterisztika felírásakor a "legkorábbi" $\pmb{x}$ együtthatója fogja a konstans szerepét betölteni, és ahogy $t$-ben megyünk előre, úgy emelkedik $r$ kitevője is. Úgy is gondolhatunk rá, hogy a másodrendű egyenletben 2 darab késleltetés van ($\pmb{x}_{t-1}$ és $\pmb{x}_{t-2}$), tehát $r$ a második kitevőig fog menni, együtthatói pedig rendre $\pmb{x}$-ek együtthatói lesznek. Felmerül a kérdés persze, hogy miért is jó ez nekünk?
+\\
+Tekintsük megint az
+\[
+	\pmb{x}_t = a\pmb{x}_{t-1}
+\]
+elsőrendű rendszert ($a \in \mathbb{R}$). Karakterisztikus egyenlete (avagy karakterisztikája):
+\[
+	r = a,
+\]
+ennek gyöke triviálisan $r = a$. Láttuk, hogy az állapotváltozó $t$-ben $a^tx_0$ értéket vesz föl, tehát a \emph{karakterisztikus gyök} ($a$) időhatványa szerepel a megoldásban. Innen jön a gondolat, hogy bárhányad fokú is a karakterisztikus egyenlet, a gyökei időhatványként szerepelnek majd a megoldásban, együtthatóik pedig a kezdőértékek függvényei lesznek. A Fibonacci-számsor dinamikájának karakterisztikus egyenletére visszatérve, és $r$ helyett az elterjedtebb $\lambda$ jelölést bevezetve a karakterisztikus gyökre:
+\[
+	\lambda^2 = \lambda + 1
+\]
+\[
+	\lambda_1 = \frac{1+\sqrt{5}}{2}, \quad \lambda_2 = \frac{1-\sqrt{5}}{2}
+\]
+2 különböző karakterisztikus gyökünk van, így ismét a szuperpozíció elvére támaszkodva felírhatjuk a megoldást:
+\[
+	\pmb{x}_t = c_1(\frac{1+\sqrt{5}}{2})^{t} + c_2(\frac{1-\sqrt{5}}{2})^{t},
+\]
+ahol $c_1$ és $c_2$ konstansok értékét $t=0$ és $t=1$ kezdőállapot-behelyettesítéssel határozhatjuk meg. Vegyük észre, hogy ha csak $\pmb{x}_0$ kezdőállapotot tudtuk volna, akkor egy kétismeretlenes egyenletet kellene megoldanunk, és végtelen sok megoldásunk lenne. Leszűrhető tehát a tény, hogy ha $n$-edrendű egyenletekkel dolgozunk, $n$ darab kezdőértékre lesz szükség általánosságban az egyértelmű megoldáshoz. A lineáris differenciaegyenlet-rendszereket bemutató fejezetben láttuk, hogy tetszőleges $p$-edrendű egyenletrendszer átírható elsőrendű rendszerré, így elkerülve a $p$-edrendű egyenletek gyökkeresését.
+
+\subsection{Karakterisztikus gyökök a másodrendű esetben}
+
+A másodrendű karakterisztikus egyenleteknek három fajta karakterisztikus gyök-konfigurációja képzelhető el, ebből az első esetet (kettő különböző valós gyök) már láttuk. Ha $\lambda_1$ komplex gyök lenne, $\lambda_2$-nek szükségszerűen $\bar{\lambda_1}$-nek kellene lennie, tehát mindkét gyök komplex lesz, időhatványai így \emph{komplex időhatványok} lesznek, de a valós állapotváltozóink nem fognak komplexxé válni a komplex időhatványok miatt, hanem oszcilláló természetűek lesznek. A különböző gyökök esetén tehát a megoldás az alábbi alakban írható föl:
+\[
+	\pmb{x}_t = c_1\lambda_1^t + c_2\lambda_2^t, \quad \lambda_1 \ne \lambda_2, \lambda_1, \lambda_2 \in \mathbb{K}
+\]
+A $\lambda_1, \lambda_2 \in \mathbb{C}$ esetben $\lambda_{1,2} = \alpha \pm i\beta$, De Moivre azonosságát és $\theta := arctan(\frac{\beta}{\alpha})$, $r := |\alpha + i\beta|$ elnevezéseket felhasználva
+\begin{align*}
+	\pmb{x}_t = c_1(\alpha + i\beta)^t + c_2(\alpha - i\beta)^t =  r^t(c_1 cos(\theta t) + c_2 sin(\theta t))
+\end{align*}
+
+alakot kapjuk. 
+Az ismételt gyökök esetén érdekesebb a helyzet:
+\[
+	\pmb{x}_t = \lambda^t(c_1 + c_2t), \quad \lambda_1 = \lambda_2 = \lambda, \lambda \in \mathbb{R}
+\]
+$\lambda$ valós lesz (csak valós szám komplex konjugáltja lehet egyenlő önmagával), és a megoldásban megjelenik egy $(c_1 + c_2t)$ t-től függő "inhomogén" tag is. Ennek belátása most nem feladatunk, azonban a Függelékben megtalálható lesz a bizonyítás az érdeklődők számára. Megfigyelhető egy érdekes analógia a differenciaegyenlet-rendszerekkel párhuzamban: $\lambda$-k most is ugyanúgy viselkednek az időhatványok tekintetében, mint ahogy az állapotáttérés-mátrix sajátértékeiként tették az első fejezetben.
+
+\subsection{Karakterisztikus egyenlet és operátorok kapcsolata}
+Tekintsük az alábbi másodrendű lineáris differenciaegyenletet operátorokkal felírva:
+\[
+	\mathcal{T}^2\pmb{x}_t + 5\mathcal{T}\pmb{x}_t + 6\pmb{x} = 0
+\]
+Faktorizálva:
+\[
+	(\mathcal{T}+2)(\mathcal{T}+3)\pmb{x}_t = 0
+\]
+Mivel $\pmb{x}_t$ nem azonosan 0, így az egyenlet pontosan akkor teljesül, ha
+\[
+	(\mathcal{T}+2)\pmb{x}_t = 0
+\]
+vagy
+\[
+	(\mathcal{T}+3)\pmb{x}_t = 0
+\]
+A kettő megoldást összetéve adódik a homogén megoldás:
+\[
+	\pmb{x}_t = c_1(-2)^t + c_2(-3)^t
+\]
+
+Látható, hogy $\mathcal{T}$-k pontosan a karakterisztikus egyenletbeli $\lambda$-knak felelnek meg, így a karakterisztikus gyökök módszerével kapott megoldás egyezik a $(\mathcal{T}+2)$ illetve $(\mathcal{T}+3)$ operátorok magterének megtalásával kapott eredménnyel, ahol ebben az esetben $-2$ és $-3$ feleltethetőek meg a kvázi sajátértékeknek.
+\\
+\\
+Vegyünk még egy példát, ezúttal egy elsőrendű inhomogén egyenletet:
+\[
+	\pmb{x}_t - \mathcal{T}\pmb{x}_t = t^3
+\]
+Faktorizálva az operátort:
+\[
+	(1-\mathcal{T})\pmb{x}_t = t^3
+\]
+\[
+	\pmb{x}_t = (1-\mathcal{T})^{-1}t^3
+\]
+Láthatjuk tehát, hogy akár inhomogén esetben is $\pmb{x}_t$ megoldás megtalálásához elég az $(1-\mathcal{T})$ operátor inverzének megtalálása, ami persze kicsit sem triviális feladat, és létezése sem egyértelmű. Intuitíven persze $\mathcal{T}$ inverze egy "időbeli visszatolás" operátorként működne.
+
+\subsection{Operátorok mátrix-alakja véges fokú polinomok esetén}
+Tekintsük a harmadfokú polinomok vektorterét példának okáért. A harmadfokú polinomok vektortere a $c, x, x^2, x^3$ vektorok által kifeszített vektortér, ahol $c$ konstans. $\mathbf{V} = lin(c, x, x^2, x^3)$. Például
+\[
+	x + 3x^2 = 
+	\begin{bmatrix}
+	0 \\
+	1 \\
+	3 \\
+	0
+	\end{bmatrix}
+\]
+a vektor-reprezentációja az $x + 3x^2$ polinomnak. $\mathcal{T}$ minden konstanst önmagába visz, hiszen időben állandó változóra triviálisan nincs hatással. Hasonlóan az $x$, $x^2$ és $x^3$ bázisvektorokra való hatását megnézve adódik $\mathcal{T}$ mátrix-alakja:
+\[
+	\mathcal{T} =
+	\begin{bmatrix}
+	1 & 1 & 1 & 1 \\
+	0 & 1 & 2 & 3 \\
+	0 & 0 & 1 & 3 \\
+	0 & 0 & 0 & 1
+	\end{bmatrix}
+\] 
+$\mathcal{T}$ felső-háromszög mátrix, tehát sajátértékei a diagonális elemek, ebben az esetben $\lambda = 1$, $\mu_a = 4$ algebai multiplicitással, invertálható mátrix. 
+Ezen eljárással nézzük meg $\mathcal{D}$, $\Delta$ és $\phi$ operátorok mátrix alakját is:
+\[
+	\mathcal{D} = 
+	\begin{bmatrix}
+		0 & 1 & 0 & 0 \\
+		0 & 0 & 2 & 0 \\
+		0 & 0 & 0 & 3 \\
+		0 & 0 & 0 & 0
+	\end{bmatrix}
+\]
+\[
+	\Delta = 
+	\begin{bmatrix}
+		0 & 1 & 1 & 1 \\
+		0 & 0 & 2 & 3 \\
+		0 & 0 & 0 & 3 \\
+		0 & 0 & 0 & 0
+	\end{bmatrix}
+\]
+\[
+	\phi = 
+	\begin{bmatrix}
+		1 & 0 & 0 & 0 \\
+		0 & 1 & -1 & 2 \\
+		0 & 0 & 1 & -3 \\
+		0 & 0 & 0 & 1
+	\end{bmatrix}
+\]
+Azonnal észrevehetjük a hasonlóságot $\Delta$ és $\mathcal{D}$ között, mégpedig hogy mindketten szinguláris mátrixok, tehát nem létezik inverzük. Ez a megállapítás semmi más, mint a határozatlan integrálással avagy szummázással együttjáró $C$ plusz konstans létének fontossága. Ha az olvasó kedvet érez magában, felírhatja $\Sigma$ mátrix-alakját és megpróbálhat mátrixoperációkkal igazolni néhány, az operátorokról szóló fejezetben bemutatott azonosságokat $\mathbf{V}$-ben, illetve $\phi$ segítségével explicite kiszámítani az \emph{első n négyzetszám} probléma megoldását, a könyv azonban nem fog mélyebben belemenni ezen feladatokba.
+\\
+\\
+Elrugaszkodva a szimplisztikus 4-dimenziós vektorterünktől belátható, hogy $\mathcal{D}$, $\Delta$ operátorok minden sajátértéke $0$ és $\mathcal{T}$ minden sajátértéke $1$. Lineáris algebrából tudjuk, hogy ha $A$ és $B$ mátrixok egyidejűleg diagonalizálhatóak egy megfelelő $P$ áttérésmátrixxal, azaz
+\[
+	A = PBP^{-1}
+\] 
+\[
+	B = PAP^{-1}
+\]
+\[
+	AB = BA
+\]
+akkor $A + B$ sajátértékei $A$ és $B$ sajátértékeinek összegei lesznek, így
+\[
+	\sigma(1 + A) = \sigma(1) \oplus \sigma{A},
+\]
+speciálisan
+\[
+	0 \in \sigma(1 - \mathcal{T})
+\]
+Azt kaptuk tehát, hogy az előző alfejezet végén bevezetett $(1 - \mathcal{T})$ operátor nem is invertálható. Az ilyen kellementlenségeket elkerülvén a következő fejezettől áttérünk a differenciálegyenletek $\Delta$ operátorral való felírására. Emlékeztetőül az első-különbség operátorral formalizált elsőrendű homogén differenciaegyenlet az alábbi alakot ölti tetszőleges $a \in \mathbb{R}$ koefficienssel:
+\[
+	\pmb{x}_t = a \Delta \pmb{x}_{t-1}
+\]
+
+\subsection[Elsőrendű egyenletek zárt megoldása]{Elsőrendű inhomogén lineáris differenciaegyenletek zárt alakú megoldása}
+
+Jelölje $a_n$ az állapotváltozónkat $n$ időpillanatban, és tekintsük az alábbi elsőrendű inhomogén differenciaegyenletet:
+\[
+	a_{n+1} - f_n a_n = g_n
+\]
+ahol $f_n \ne 0 \quad \forall n \in \mathbb{N}$.
+Leosztva mindkét oldalt $\prod_{k=0}^{n}{f_k}$-val:
+\[
+	\frac{a_{n+1}}{\prod_{k=0}^{n}{f_k}} - \frac{f_n a_n}{\prod_{k=0}^{n}{f_k}} = \frac{g_n}{\prod_{k=0}^{n}{f_k}}
+\]
+\[
+	A_n := \frac{a_n}{\prod_{k=0}^{n-1}{f_k}}
+\]
+\[
+	A_{n+1} - A_n = \frac{g_n}{\prod_{k=0}^{n}{f_k}}
+\]
+$\prod$ maga is egy operátor, tehát a vele való leosztás igazából az inverzének applikációját jelenti.
+Teleszkopikus szummázással $0$-tól $(n-1)$-ig adódik
+\[
+	\frac{a_n}{\prod_{k=0}^{n-1}{f_k}} = A_0 + \sum_{m=0}^{n-1}{\frac{g_m}{\prod_{k=0}^{m}{f_k}}}
+\]
+$a_n$-re rendezve adódik a megoldás:
+\[
+	a_n = (\prod_{k=0}^{n-1}{f_k})(A_0 + \sum_{m=0}^{n-1}{\frac{g_m}{\prod_{k=0}^{m}{f_k}}})
+\]
+Ez nem más, mint a \emph{diszkrét idejű Cauchy-formula}. A következő fejezetben visszatérünk erre a formulára, és látni fogjuk, hogy a produktum operátor folytonos időben \emph{integráló faktorrá} válik.
+\section{Folytonos idejű rendszerek}
+Míg diszkrét időben az időbeli eltolást ki tudtuk fejezni a $\mathcal{T}$ operátorral, folytonos időben a végtelenül kicsi időközök miatt ezt már így explicite nem tehetjük meg, hanem a $\Delta$ operátor mintájára annak folytonos párjával, $\mathcal{D}$ differenciálás operátorral kell dolgoznunk. A könyvben ezentúl $\mathcal{D}$ mindig az idő szerinti differenciálást fogja jelenteni. A diszkrét időhöz hasonlóan itt is megkülönböztethetünk \emph{lineáris, elsőrendű vagy magasabb rendű egyenleteket és egyenletrendszereket}. A "differencia" szó helyett a "differenciál" szó használatával élve tehát beszélhetünk n-edrendű differenciálegyenletekről, differenciálegyenlet-rendszerekről. 
+\\
+\\
+Az $\pmb{x}$ állapotváltozó szintén folytonos idejű lesz, így $\pmb{x}(t)$ vagy csak egyszerűen $\pmb{x}$ alakban írjuk. Az idő szerinti első deriváltat általában $\dot{\pmb{x}}$-al vagy $\pmb{x}'$-el fejezzük ki. Persze
+\[
+	\mathcal{D}\pmb{x} = \dot{\pmb{x}}
+\]
+\subsection{Lineáris elsőrendű differenciálegyenlet-rendszerek}
+Az elsőrendű lineáris homogén n-tagú differenciálegyenlet-rendszer általános alakja $\mathcal{A} \in \mathbb{R}^{n \times n}$ áttérés-mátrixxal:
+\[
+	\dot{\pmb{x}} = \mathcal{A}\pmb{x}
+\]
+Ennek megoldása $\pmb{x}_0$ kezdeti érték mellett
+\[
+	\pmb{x} = e^{\mathcal{A}t}\pmb{x}_0
+\]
+ahol $e^{\mathcal{A}}$ az operátorokról szóló fejezethez hasonlóan \emph{mátrix-exponenciálás}. Ha az olvasó visszaemlékszik, használtuk már ezt a műveletet, csak áttérés-mátrix helyett $\mathcal{T}$, $\mathcal{D}$ és $\Delta$ operátorokkal, de itt is ugyanúgy működik a kifejtése, mégpedig az exponenciális függvény hatványsorba fejtésével. Az $(1  \times 1)$-es skalár "áttérés-mátrixxal" teljesen analóg módon belátható, hogy $\mathcal{D}e^{\mathcal{A}t} = \mathcal{A}e^{\mathcal{A}t}$, így valóban megoldása a differenciálegyenlet-rendszernek.
+
+\subsection{A differenciálegyenlet-rendszer fundamentuma}
+
+Írjuk ki az exponenciális függvényt hatványsorösszegként:
+\[
+	e^{\mathcal{A}} = \sum_{k=0}^{\infty}{\frac{\mathcal{A}^k}{k!}}
+\]
+$\mathcal{A}$ spektrális felbontásával felírva $\mathcal{A} = \mathcal{S}D\mathcal{S}^{-1}$, és így
+\[
+	e^{\mathcal{A}} = \sum_{k=0}^{\infty}{\frac{(\mathcal{S}D\mathcal{S}^{-1})^k}{k!}} = \mathcal{S}e^{D}\mathcal{S}^{-1}
+\]
+A korábban látott mátrixfüggvény-tulajdonságok miatt $e^{D}$ alakja Jordan-blokkokkal felírva
+\[
+		e^D = 
+			\begin{bmatrix}
+			e^{\textswab{J}(\lambda_1)} & \textswab{0} & \dots & \textswab{0} \\
+			\textswab{0} & e^{\textswab{J}(\lambda_2)} & \dots & \textswab{0} \\
+			\vdots & \vdots & \ddots & \vdots \\
+			\textswab{0} & \textswab{0} & \dots & e^{\textswab{J}(\lambda_n)}
+			\end{bmatrix}
+\]
+Ha $\textswab{J}$-k $(1 \times 1)$-esek (azaz minden sajátérték algebrai multiplicitása $1$), akkor a kifejezés az alábbi formára egyszerűsődik:
+\[
+	e^D =
+	\begin{bmatrix}
+	e^{\lambda_1} & 0 & \dots & 0 \\
+	0 & e^{\lambda_2} & \dots & 0 \\
+	\vdots & \dots  & \ddots & \vdots \\
+	0 & 0 & \dots & e^{\lambda_n}
+	\end{bmatrix}
+\]
+Hozzátéve még a $t$-vel való hatványozást:
+\[
+	e^{\mathcal{A}t} = \mathcal{S}
+	\begin{bmatrix}
+	e^{\lambda_1 t} & 0 & \dots & 0 \\
+	0 & e^{\lambda_2 t} & \dots & 0 \\
+	\vdots & \dots  & \ddots & \vdots \\
+	0 & 0 & \dots & e^{\lambda_n t}
+	\end{bmatrix} \mathcal{S}^{-1}
+\]
+Ha $(2 \times 2)$-es Jordan-blokkunk van, akkor $e^{\textswab{J}(\lambda)}$ alakja
+\[
+	e^{\textswab{J}(\lambda)} = 
+	\begin{bmatrix}
+	e^{\lambda} & e^{\lambda} \\
+	0 & e^{\lambda}
+	\end{bmatrix}
+\]
+lesz, a $t$-vel való hatványozás pedig a $(\cdot)^t$ mátrixfüggvényről belátott összefüggés alapján
+\[
+	e^{\textswab{J}(\lambda)t} = 
+		\begin{bmatrix}
+		e^{\lambda t} & t e^{\lambda t} \\
+		0 & e^{\lambda t}
+		\end{bmatrix}
+\]
+alakot adja. Nagyobb Jordan-blokkok esetén a hatványozáshoz hasonló minta jelenik meg, de most szorítkozzunk a $(2 \times 2)$-es eset leírására.
+
+A fenti $e^{\mathcal{A}t}$, $t$-től függő mátrixot nevezzük \emph{fundamentumnak}, vagy \emph{fundamentális megoldásnak}, és általában $\mathbf{\Phi}$-vel jelöljük.
+Egy $\pmb{x}_0$ kezdeti értékű homogén feladat megoldása tehát
+\[
+	\pmb{x}(t) = \mathbf{\Phi}(t) \pmb{x}_0
+\]
+\[
+	\mathbf{\Phi}(t) = e^{\mathcal{A}t}
+\]
+fundamentum mellett. Vegyük észre, hogy a fundamentum inverze egyfajta "időbeli megfordítást" jelent,
+\[
+	\mathbf{\Phi}^{-1}(t) = \mathbf{\Phi}(-t)
+\]
+és
+\[
+	\mathbf{\Phi}(0) = I_{n \times n}
+\]
+az identitás mátrix.
+\subsection{A fundamentum alakja 2x2 rendszer esetén}
+Az elsőrendű lineáris differenciaegyenlet-rendszerek tanulmányozása során érdemes szót ejteni külön a $(2 \times 2)$-es esetről. Ha a két sajátérték valós, különböző, akkor a fundamentum alakja
+\[
+	e^{\mathcal{A}t} = e^{\lambda_1 t}\left(\frac{\mathcal{A}-\lambda_2 I}{\lambda_1 - \lambda_2}\right) + e^{\lambda_2 t}\left(\frac{\mathcal{A}-\lambda_1 I}{\lambda_2 - \lambda_1}\right)
+\]
+Ha $\lambda_1 = \lambda_2$:
+\[
+	e^{\mathcal{A}t} = e^{\lambda t}(I + t(\mathcal{A}-\lambda I))
+\]
+Ha pedig a gyökök $\lambda_{1,2} = \alpha + i\beta$ komplexek:
+\[
+	e^{\mathcal{A} t} = e^{\alpha t}\left( cos(\beta t)I + sin(\beta t) \frac{\mathcal{A} - \alpha I}{\beta} \right)
+\]
+Ezen formulák belátása nem feladatunk, de érdemes megjegyezni őket, hisz így elkerülhetjük a sajátvektorok számítását, és a gyakorlatban is legtöbbször ilyen formában számítjuk ki a megoldást. 
+\subsection{Inhomogén rendszer megoldása fundamentummal}
+Hasonlóan a diszkrét idejű rendszerekhez, folytonos időben is beszélhetünk inhomogén feladatokról, alakjuk
+\[
+	\dot{\pmb{x}}(t) = \mathcal{A}\pmb{x}(t) + \pmb{\omega}(t)
+\]
+A szuperpozíció elve itt is teljesül, tehát a teljes megoldás megint $\pmb{x}^h$ homogén és $\pmb{x}^p$ partikuláris megoldások összege lesz. Ennek belátása ugyanúgy történik, mint a differenciaegyenlet-rendszereknél, csak $\mathcal{T}$ helyett $\mathcal{D}$ operátorral. Csakúgy, mint diszkrét idő esetében, a lineáris inhomogén differenciaegyenleteknél is létezik zárt formula a megoldásra, ezt nevezzük \emph{Cauchy-formulának}.
+\[
+	\pmb{x}(t) = \mathbf{\Phi}(t)\pmb{x}_0 + \mathbf{\Phi}(t)\int_{0}^{t}{\mathbf{\Phi}^{-1}(s) \pmb{\omega}(s)ds}
+\]
+$\mathbf{\Phi}$ fundamentum semmi más, mint az \emph{integráló faktor}, azaz $e^{\int{\mathcal{A}(s)ds}} = e^{\mathcal{A}t} = \mathbf{\Phi}(t)$, a határozatlan integrálással együttjáró konstans értékét pedig tekinthetjük $0$-nak, hiszen elég \emph{egy} kielégítő megoldást találnunk. Teljes formájában kiírva tehát
+\[
+	\pmb{x}(t) = e^{\int{\mathcal{A}(s)ds}}[\pmb{x}_0 + \int_{0}^{t}{e^{-\int_{0}^{s}{\mathcal{A}(r)dr}}}\pmb{\omega}(s)]
+\]
+Összevetve a \emph{diszkrét Cuachy-formulával}
+\[
+	\pmb{x}_n = (\prod_{k=0}^{n-1}{f_k})(A_0 + \sum_{m=0}^{n-1}{\frac{g_m}{\prod_{k=0}^{m}{f_k}}})
+\]
+látható, hogy nem csak a szummának, hanem a diszkrét idejű produktum operátornak is létezik folytonos idejű párja, mégpedig:
+\[
+	\prod = \phi e^{\int} \phi^{-1}	
+\]
+Az eddigi jelölésekkel élve természetesen létezik fundamentuma a diszkrét rendszernek is, mégpedig
+\[
+	\mathbf{\Phi}_d = \prod{f_k}
+\]
+\subsection{Magasabb rendű differenciálegyenletek}
+A diszkrét idő analógiájaként bevezetjük a magasabb rendű differenciálegyenleteket, és csakúgy, mint a differenciaegyenletek esetén, itt is az egyszerűség kedvéért $(1 \times 1)$-es állapotáttérés-mátrixokkal dolgozunk. Itt is igaz, hogy tetszőleges $n$-edrendű egyenlet felírható egy $n$ tagú differenciálegyenlet-rendszerként, a különbség annyi, hogy ekkor az állapotvektorunk elemei $\pmb{x}$, $\dot{\pmb{x}}$, $\ddot{\pmb{x}}$, stb... lesznek.
+Operátorformában felírva az $n$-edrendű differenciálegyenlet $a_k \in \mathbb{R}$ koefficiensekkel:
+\[
+	\sum_{k=0}^{n}{a_k\mathcal{D}^k\pmb{x}(t)} = \pmb{\omega}(t)
+\]
+ahol $\pmb{\omega}(t)$ megint az inhomogén tag.
+A diszkrét magasabb rendű egyenleteknél bevezetett \emph{karakterisztikus gyökök} itt is a homogén rendszer megoldásának központi elemét képzik, a szuperpozíció elve alapján pedig szintén teljesülni fog, hogy $\lambda_1$, $\lambda_2 \dots$ karakterisztikus gyökök esetén a megoldás $e^{\lambda}$-k lineáris kombinációjaként fog előállni.
+\\
+\\
+Nézzünk meg egy konkrét példát homogén rendszer esetén, operátorformában felírva: 
+\[
+	\mathcal{D}^2\pmb{x} + 5\mathcal{D}\pmb{x} + 6\pmb{x} = 0
+\]
+Faktorizálva:
+\[
+	(\mathcal{D}+2)(\mathcal{D}+3)\pmb{x} = 0
+\]
+Látható, hogy a megoldás $e^{-2t}$ és $e^{-3t}$ valamilyen lineáris kombinációja lesz, a konstans együtthatók megtalálásához persze szükség van $\pmb{x}_0$ kezdeti értékre.
+
+A diszkrét esettel azonosan ha most speciálisan a másodrendű differenciálegyenletek vizsgálatára szorítkozunk, akkor a karakterisztikus gyökök lehetnek különböző valósak, ismételt valósak vagy komplexek. Ezen esetekben a homogén megoldás alakja rendre
+\[
+	\pmb{x}(t) = c_1e^{\lambda_1 t} + c_2e^{\lambda_2 t}, \quad \lambda_1 \ne \lambda_2 \in \mathbb{R}
+\]
+\[
+	\pmb{x}(t) = (c_1 + c_2t)e^{\lambda t}, \quad \lambda_1 = \lambda_2 = \lambda \in \mathbb{R}
+\]
+\[
+	\pmb{x}(t) = e^{\alpha t}(c_1 cos(\beta t) + c_2 sin(\beta t)), \quad \lambda_{1,2} = \alpha \pm i\beta \in \mathbb{C}
+\]
+Tanulságos összevetni a kapottakat a diszkrét másodrendű rendszernél tapasztaltakkal: A $\lambda^t$-s tagok $e^{\lambda t}$-re változtak, a komplex gyökök esetén pedig $r^t = |\alpha + i\beta|^t$ helyett $e^{\alpha t}$, $\theta = arctan(\frac{\beta}{\alpha})$ helyett pedig egyszerűen $\beta$ jelenik meg. A komplex gyökök esetét az Euler-formula segítségével jobban megérthetjük:
+\[
+	e^{\lambda_1 t} = e^{(\alpha + i\beta) t} = e^{\alpha t} e^{i\beta t} = e^{\alpha t}(cos(\beta t) + i sin(\beta t))
+\]
+\[
+	e^{\lambda_2 t} = e^{(\alpha - i\beta) t} = e^{\alpha t} e^{-i\beta t} = e^{\alpha t}(cos(\beta t) - i sin(\beta t))
+\]
+Csakúgy mint diszkrét egyenletek és egyenletrendszerek esetén, itt sem fognak "mágikus" módon a valós állapotvektoraink kopmlexxé válni csak azért, mert a gyökeink komplexek; helyette oszcilláló mozgást végeznek, persze egy exponenciális szorzóval
+\subsection{A partikuláris megoldás}
+Az
+\[
+	\dot{\pmb{x}} = \mathcal{A}\pmb{x} + \pmb{\omega}
+\]
+inhomogén rendszer partikuláris megoldása a diszkrét időhöz hasonlóan megint csak $\omega$ alakjától fog függni. A fontosabb alakok:
+
+\begin{center}
+\begin{tabular}{ c c }
+
+	$\pmb{\omega}$ & $\pmb{x}^p$ \\
+	\hline
+	konstans $c$ & konstans $k$ \\ 
+	$at + b$ & $At + B$ \\  
+	$at^p + \dots + bt + c$ & $At^p + \dots + Bt + k$ \\
+	$a\cdot cos(kt)$ & $A\cdot cos(kt) + B\cdot sin(kt)$ \\    
+	$a\cdot sin(kt)$ & $A\cdot cos(kt) + B\cdot sin(kt)$ \\ 
+	$a e^{kt}$ & $A e^{kt}$
+
+\end{tabular}
+\end{center}
+Azonban vigyáznunk kell, hiszen bizonyos esetekben lehetséges az, hogy kettő lineárisan függő vektor lineáris kombinációját vesszük. Ez ugyanaz a probléma, ami miatt az ismételt karakterisztikus gyök esetén az elsőfokú $t$-s tag megjelenik mint szorzó, ezzel elkerülve a lineáris függőséget. Honnan tudjuk tehát, hogy mikor kell a $t$-vel való szorzás?
+\\
+\\
+Legyen $\alpha$ az inhomogén tagban lévő \emph{exponenciális kitevő}, $\beta$ pedig a \emph{trigonometrikus együttható}. Definiáljuk ezek segítségével $\hat{\lambda}$-t:
+\[
+	\hat{\lambda} := \alpha + i\beta
+\]
+$\hat{\lambda}$ persze lehet valós vagy komplex szám is. Nézzük meg, hogy $\hat{\lambda}$ benne van-e a karakterisztikus gyökök halmazában. Ha nincs benne, nem kell $t$-s szorzótag, ha pedig benne van, akkor kell. (példának okárt $\pmb{x}^p = Acos(t) + Bsin(t)$ esetén ekkor $\pmb{x}^p = t(Acos(t) + Bsin(t))$ alak kell.)
+\subsection{Partikuláris megoldás operátorokkal}
+Tekintsük az alábbi elsőrendű inhomogén differenciálegyenletet:
+\[
+	\pmb{x} - \mathcal{D}\pmb{x} = \pmb{\omega}
+\]
+A homogén megoldás $\pmb{x}^h = c_1 e^{t}$, a partikuláris megoldáshoz pedig faktorizáljunk és rendezzünk $\pmb{x}$-re. Az alábbi formát kapjuk:
+\[
+	\pmb{x} = (I - \mathcal{D})^{-1}\pmb{\omega}
+\]
+Láttuk, hogy $\mathcal{D}$ sajátértékei 0-k, így $(I - \mathcal{D})^{-1}$ létezik, ráadásul nincs abszolútértékben $1$-nél nagyobb sajátértéke, tehát \emph{korlátos operátor}, így a Neumann-sorbafejtéssel $(I - \mathcal{D})^{-1}$ kifejezhető $\mathcal{D}$ hatványsoraként.
+\[
+	(I - \mathcal{D})^{-1} = \sum_{k=0}^{\infty}{\mathcal{D}^k}
+\]
+A partikuláris megoldásunk tehát
+\[
+	\pmb{x}^p = \pmb{\omega} + \mathcal{D}\pmb{\omega} + \mathcal{D}^2\pmb{\omega} + \dots,
+\]
+és hozzáadva a homogén megoldást:
+\[
+	\pmb{x} = c_1 e^{t} + \pmb{\omega} + \mathcal{D}\pmb{\omega} + \mathcal{D}^2\pmb{\omega} + \dots
+\]
+Ha például $\pmb{\omega}(t) = t^3$, akkor már $\mathcal{D}^4\pmb{\omega} = 0$. Ha azonban $\pmb{\omega} = sin(t)$ alakú, látható, hogy egy végtelen trigonometrikus összeghez jutunk, így ez a technika nem minden esetben alkalmazható.
+
+\section{A diszkrét és folytonos idejű dinamikus rendszerek kapcsolata}
+Emlékezzünk vissza az operátorokat bemutató fejezetben leírt fontos azonosságokra tetszőleges $a \in \mathbb{R}$ mellett:
+\[
+	\phi e^{ax} = (a+1)^x
+\]
+\[
+	\Delta = \mathcal{T} - 1
+\]
+Tekintsük megint az egyik példa-differenciálegyenletünket:
+\[
+	\mathcal{D}^2\pmb{x} + 5\mathcal{D}\pmb{x} + 6\pmb{x} = 0
+\]
+\[
+	(\mathcal{D} + 2)(\mathcal{D} + 3)\pmb{x} = 0
+\]
+\[
+	\pmb{x}(t) = c_1 e^{-2t} + c_2 e^{-3t},
+\]
+$\mathcal{D}$ operátort $\mathcal{T}$-ra cserélve differenciaegyenletet kapunk:
+\[
+	\mathcal{T}^2\pmb{x} + 5\mathcal{T}\pmb{x} + 6\pmb{x} = 0
+\]
+\[
+	(\mathcal{T} + 2)(\mathcal{T} + 3)\pmb{x} = 0
+\]
+\[
+	\pmb{x}(t) = c_1 (-2)^t + c_2 (-3)^t,
+\]
+$\Delta = \mathcal{T} - 1$ operátorral pedig az alábbiakat kapjuk:
+\[
+	\Delta^2\pmb{x} + 5\Delta\pmb{x} + 6\pmb{x} = 0
+\]
+\[
+	(\Delta + 2)(\Delta + 3)\pmb{x} = 0
+\]
+\[
+	(\mathcal{T}+1)(\mathcal{T}+2)\pmb{x} = 0
+\]
+\[
+	\pmb{x}(t) = c_1 (-1)^t + c_2 (-2)^t,	
+\]
+Mivel az exponenciális operátor-kapcsolatból most $x$ helyett $t$-vel és $a$ helyett rendre $-2$ és $-3$ beírásával $\phi e^{-2t} = (-2 + 1)^t = (-1)^t$ és $\phi e^{-3t} = (-3 + 1)^t = (-2)^t$ egyenlőség áll, így észrevehetjük, hogy $\mathcal{D}$-ről $\Delta$-ra változtatva az operátort (diszkretizáció) a differenciaegyenlet megoldása
+\[
+	\pmb{x}(t) = c_1 \phi e^{-2t} + c_2 \phi e^{-3t} = c_1 (-1)^t + c_2 (-2)^t
+\] 
+alakú lesz. Mivel $\phi$ lineáris operátor, az összefüggés még kompaktabban megfogalmazható:
+\\
+\\
+\emph{Legyen $\pmb{x}$ megoldása a differenciálegyenletnek. Ekkor az azonos rendű és koefficiensű differenciaegyenlet megoldása $\phi \pmb{x}$ lesz.}
+
+\end{document}
